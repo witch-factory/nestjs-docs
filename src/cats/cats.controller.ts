@@ -9,8 +9,7 @@ import {
 } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { CatsService } from './cats.service';
-import { ZodValidationPipe } from 'src/pipes/validation.pipe';
-import { createCatSchema } from './schema';
+import { ValidationPipe } from 'src/pipes/validation.pipe';
 
 @Controller('cats')
 export class CatsController {
@@ -20,8 +19,7 @@ export class CatsController {
 
   // 이때 Postman으로 요청 보내면 age가 string이라서 에러 발생
   @Post()
-  @UsePipes(new ZodValidationPipe(createCatSchema))
-  create(@Body() createCatDto: CreateCatDto) {
+  create(@Body(new ValidationPipe()) createCatDto: CreateCatDto) {
     console.log(createCatDto);
     this.catsService.create(createCatDto);
   }
