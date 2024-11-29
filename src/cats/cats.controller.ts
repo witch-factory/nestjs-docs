@@ -6,15 +6,18 @@ import {
   ParseIntPipe,
   Post,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { CatsService } from './cats.service';
 import { ValidationPipe } from 'src/pipes/validation.pipe';
 import { RolesGuard } from 'src/roles/roles.guard';
 import { Roles } from 'src/roles/roles.decorator';
+import { LoggingInterceptor } from 'src/logging.interceptor';
 
 @Controller('cats')
 @UseGuards(RolesGuard)
+@UseInterceptors(LoggingInterceptor)
 export class CatsController {
   // injected
   // catsService 선언과 초기화
