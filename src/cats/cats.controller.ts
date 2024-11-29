@@ -1,17 +1,16 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
-  UseFilters,
+  UsePipes,
 } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { CatsService } from './cats.service';
-import { HttpExceptionFilter } from 'src/http-exception.filter';
+import { ZodValidationPipe } from 'src/pipes/validation.pipe';
+import { createCatSchema } from './schema';
 
 @Controller('cats')
 export class CatsController {
@@ -19,20 +18,21 @@ export class CatsController {
   // catsService 선언과 초기화
   constructor(private catsService: CatsService) {}
 
+  // 이때 Postman으로 요청 보내면 age가 string이라서 에러 발생
   @Post()
-  @UseFilters(HttpExceptionFilter)
+  @UsePipes(new ZodValidationPipe(createCatSchema))
   create(@Body() createCatDto: CreateCatDto) {
-    throw new ForbiddenException();
+    console.log(createCatDto);
+    this.catsService.create(createCatDto);
   }
 
   @Get()
   async findAll() {
-    return new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    return this.catsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): string {
-    console.log(id);
-    return `This action returns a #${id} cat`;
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.catsService.findOne(id);
   }
 }
